@@ -1,0 +1,1 @@
+{"root":["./src/App.tsx","./src/main.tsx","./src/vite-env.d.ts","./src/components/AuthForm.tsx","./src/components/FlowEditor.tsx","./src/contexts/AuthContext.tsx","./src/lib/supabase.ts"],"version":"5.9.3"}
