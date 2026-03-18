@@ -14,7 +14,7 @@ import ReactFlow, {
 import 'reactflow/dist/style.css';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase, Flow } from '../lib/supabase';
-import { Save, FolderOpen, LogOut, Plus, Trash2 } from 'lucide-react';
+import { Save, FolderOpen, LogOut, Plus, Trash2, CheckCircle, XCircle } from 'lucide-react';
 
 const initialNodes: Node[] = [
   {
@@ -25,6 +25,45 @@ const initialNodes: Node[] = [
   },
 ];
 
+// ── Toast Component ────────────────────────────────────────────────────────
+function Toast({ message, type }: { message: string; type: 'success' | 'error' }) {
+  return (
+    <div
+      style={{
+        position: 'fixed',
+        bottom: '24px',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        zIndex: 9999,
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px',
+        padding: '12px 20px',
+        borderRadius: '10px',
+        background: type === 'success' ? '#166534' : '#991b1b',
+        color: '#fff',
+        fontSize: '14px',
+        fontWeight: 600,
+        boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
+        animation: 'fadeInUp 0.2s ease',
+      }}
+    >
+      {type === 'success'
+        ? <CheckCircle size={16} />
+        : <XCircle size={16} />
+      }
+      {message}
+      <style>{`
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+          to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+// ── Main Component ─────────────────────────────────────────────────────────
 export function FlowEditor() {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -33,13 +72,21 @@ export function FlowEditor() {
   const [flows, setFlows] = useState<Flow[]>([]);
   const [showLoadMenu, setShowLoadMenu] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const { signOut, user } = useAuth();
+
+  // ── Show toast helper ────────────────────────────────────────────────────
+  const showToast = (message: string, type: 'success' | 'error') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 2500);
+  };
 
   const onConnect = useCallback(
     (params: Connection | Edge) => setEdges((eds) => addEdge(params, eds)),
     [setEdges]
   );
 
+  // ── Load all flows list ──────────────────────────────────────────────────
   const loadFlows = async () => {
     const { data, error } = await supabase
       .from('flows')
@@ -51,18 +98,46 @@ export function FlowEditor() {
     }
   };
 
+  // ── Auto-load last edited flow on login ──────────────────────────────────
   useEffect(() => {
+    const autoLoad = async () => {
+      const { data, error } = await supabase
+        .from('flows')
+        .select('*')
+        .order('updated_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (!error && data) {
+        setNodes(data.data.nodes || []);
+        setEdges(data.data.edges || []);
+        setFlowName(data.name);
+        setCurrentFlowId(data.id);
+      }
+    };
+
+    autoLoad();
     loadFlows();
   }, []);
 
+  // ── Ctrl+S keyboard shortcut ─────────────────────────────────────────────
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        handleSave();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [nodes, edges, flowName, currentFlowId, user]);
+
+  // ── Save / Update flow ───────────────────────────────────────────────────
   const handleSave = async () => {
     if (!user) return;
 
     setSaving(true);
-    const flowData = {
-      nodes,
-      edges,
-    };
+    const flowData = { nodes, edges };
 
     if (currentFlowId) {
       const { error } = await supabase
@@ -76,6 +151,9 @@ export function FlowEditor() {
 
       if (!error) {
         await loadFlows();
+        showToast('Flow saved!', 'success');
+      } else {
+        showToast('Save failed. Try again.', 'error');
       }
     } else {
       const { data, error } = await supabase
@@ -91,12 +169,16 @@ export function FlowEditor() {
       if (!error && data) {
         setCurrentFlowId(data.id);
         await loadFlows();
+        showToast('Flow saved!', 'success');
+      } else {
+        showToast('Save failed. Try again.', 'error');
       }
     }
 
     setSaving(false);
   };
 
+  // ── Load selected flow ───────────────────────────────────────────────────
   const handleLoad = (flow: Flow) => {
     setNodes(flow.data.nodes || []);
     setEdges(flow.data.edges || []);
@@ -105,6 +187,7 @@ export function FlowEditor() {
     setShowLoadMenu(false);
   };
 
+  // ── Delete flow ──────────────────────────────────────────────────────────
   const handleDelete = async (flowId: string) => {
     await supabase.from('flows').delete().eq('id', flowId);
     await loadFlows();
@@ -116,6 +199,7 @@ export function FlowEditor() {
     }
   };
 
+  // ── New flow ─────────────────────────────────────────────────────────────
   const handleNew = () => {
     setCurrentFlowId(null);
     setFlowName('Untitled Flow');
@@ -123,6 +207,7 @@ export function FlowEditor() {
     setEdges([]);
   };
 
+  // ── Add node ─────────────────────────────────────────────────────────────
   const addNode = () => {
     const newNode: Node = {
       id: `${nodes.length + 1}`,
@@ -135,6 +220,7 @@ export function FlowEditor() {
     setNodes((nds) => [...nds, newNode]);
   };
 
+  // ── Render ───────────────────────────────────────────────────────────────
   return (
     <div className="h-screen flex flex-col">
       <header className="bg-slate-900 text-white px-6 py-4 shadow-lg">
@@ -169,12 +255,13 @@ export function FlowEditor() {
               onClick={handleSave}
               disabled={saving}
               className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg transition-colors disabled:opacity-50"
+              title="Save (Ctrl+S)"
             >
               <Save className="w-4 h-4" />
               {saving ? 'Saving...' : 'Save'}
             </button>
             <button
-              onClick={() => setShowLoadMenu(!showLoadMenu)}
+              onClick={() => { setShowLoadMenu(!showLoadMenu); if (!showLoadMenu) loadFlows(); }}
               className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
             >
               <FolderOpen className="w-4 h-4" />
@@ -205,6 +292,7 @@ export function FlowEditor() {
           <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
         </ReactFlow>
 
+        {/* ── Load Menu ── */}
         {showLoadMenu && (
           <div className="absolute top-4 right-4 bg-white rounded-lg shadow-2xl p-4 w-80 max-h-96 overflow-y-auto z-50">
             <h3 className="text-lg font-semibold mb-3 text-slate-900">Your Flows</h3>
@@ -215,15 +303,27 @@ export function FlowEditor() {
                 {flows.map((flow) => (
                   <div
                     key={flow.id}
-                    className="flex items-center justify-between p-3 border border-slate-200 rounded-lg hover:border-slate-300 transition-colors"
+                    className={`flex items-center justify-between p-3 border rounded-lg transition-colors ${
+                      currentFlowId === flow.id
+                        ? 'border-blue-400 bg-blue-50'
+                        : 'border-slate-200 hover:border-slate-300'
+                    }`}
                   >
                     <button
                       onClick={() => handleLoad(flow)}
                       className="flex-1 text-left"
                     >
-                      <div className="font-medium text-slate-900">{flow.name}</div>
+                      <div className="font-medium text-slate-900">
+                        {currentFlowId === flow.id && (
+                          <span className="text-blue-500 mr-1">●</span>
+                        )}
+                        {flow.name}
+                      </div>
                       <div className="text-xs text-slate-500">
-                        {new Date(flow.updated_at).toLocaleDateString()}
+                        {new Date(flow.updated_at).toLocaleDateString('en-IN', {
+                          day: 'numeric', month: 'short', year: 'numeric',
+                          hour: '2-digit', minute: '2-digit',
+                        })}
                       </div>
                     </button>
                     <button
@@ -239,6 +339,9 @@ export function FlowEditor() {
           </div>
         )}
       </div>
+
+      {/* ── Toast ── */}
+      {toast && <Toast message={toast.message} type={toast.type} />}
     </div>
   );
-}
+    }
