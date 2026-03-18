@@ -9,61 +9,276 @@ import ReactFlow, {
   Connection,
   Edge,
   Node,
+  NodeProps,
   BackgroundVariant,
+  Handle,
+  Position,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase, Flow } from '../lib/supabase';
-import { Save, FolderOpen, LogOut, Plus, Trash2, CheckCircle, XCircle } from 'lucide-react';
+import {
+  Save, FolderOpen, LogOut, Plus, Trash2,
+  CheckCircle, XCircle, Sparkles, Loader
+} from 'lucide-react';
 
-const initialNodes: Node[] = [
-  {
-    id: '1',
-    type: 'input',
-    data: { label: 'Start' },
-    position: { x: 250, y: 25 },
-  },
-];
+// ─────────────────────────────────────────────────────────────────────────────
+// CUSTOM NODES
+// ─────────────────────────────────────────────────────────────────────────────
 
-// ── Toast Component ────────────────────────────────────────────────────────
-function Toast({ message, type }: { message: string; type: 'success' | 'error' }) {
+function RectangleNode({ data, selected }: NodeProps) {
   return (
-    <div
-      style={{
-        position: 'fixed',
-        bottom: '24px',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        zIndex: 9999,
-        display: 'flex',
-        alignItems: 'center',
-        gap: '8px',
-        padding: '12px 20px',
-        borderRadius: '10px',
-        background: type === 'success' ? '#166534' : '#991b1b',
-        color: '#fff',
-        fontSize: '14px',
-        fontWeight: 600,
-        boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
-        animation: 'fadeInUp 0.2s ease',
-      }}
-    >
-      {type === 'success'
-        ? <CheckCircle size={16} />
-        : <XCircle size={16} />
-      }
-      {message}
-      <style>{`
-        @keyframes fadeInUp {
-          from { opacity: 0; transform: translateX(-50%) translateY(10px); }
-          to   { opacity: 1; transform: translateX(-50%) translateY(0); }
-        }
-      `}</style>
+    <div style={{
+      padding: '10px 20px', borderRadius: '6px', minWidth: '120px',
+      border: `2px solid ${selected ? '#3b82f6' : '#475569'}`,
+      background: selected ? '#1e3a5f' : '#1e293b',
+      color: '#f1f5f9', fontSize: '13px', fontWeight: 500, textAlign: 'center',
+      boxShadow: selected ? '0 0 0 3px rgba(59,130,246,0.25)' : '0 2px 6px rgba(0,0,0,0.3)',
+    }}>
+      <Handle type="target" position={Position.Top} style={{ background: '#3b82f6' }} />
+      {data.label}
+      <Handle type="source" position={Position.Bottom} style={{ background: '#3b82f6' }} />
     </div>
   );
 }
 
-// ── Main Component ─────────────────────────────────────────────────────────
+function DiamondNode({ data, selected }: NodeProps) {
+  return (
+    <div style={{ position: 'relative', width: '130px', height: '85px' }}>
+      <Handle type="target" position={Position.Top} style={{ background: '#f59e0b', zIndex: 2 }} />
+      <div style={{
+        width: '90px', height: '90px',
+        background: selected ? '#451a03' : '#1c1917',
+        border: `2px solid ${selected ? '#f59e0b' : '#92400e'}`,
+        transform: 'rotate(45deg)', position: 'absolute',
+        top: '-2px', left: '18px',
+        boxShadow: selected ? '0 0 0 3px rgba(245,158,11,0.25)' : '0 2px 6px rgba(0,0,0,0.3)',
+      }} />
+      <div style={{
+        position: 'absolute', top: 0, left: 0,
+        width: '130px', height: '85px',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        color: '#fde68a', fontSize: '12px', fontWeight: 600,
+        textAlign: 'center', padding: '0 20px', zIndex: 1,
+      }}>
+        {data.label}
+      </div>
+      <Handle type="source" position={Position.Bottom} style={{ background: '#f59e0b', zIndex: 2 }} />
+      <Handle type="source" id="right" position={Position.Right} style={{ background: '#f59e0b', zIndex: 2 }} />
+    </div>
+  );
+}
+
+function CircleNode({ data, selected }: NodeProps) {
+  return (
+    <div style={{
+      width: '90px', height: '90px', borderRadius: '50%',
+      border: `2px solid ${selected ? '#22c55e' : '#166534'}`,
+      background: selected ? '#14532d' : '#0f172a',
+      color: '#86efac', fontSize: '12px', fontWeight: 700,
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      textAlign: 'center', padding: '8px',
+      boxShadow: selected ? '0 0 0 3px rgba(34,197,94,0.25)' : '0 2px 6px rgba(0,0,0,0.3)',
+    }}>
+      <Handle type="target" position={Position.Top} style={{ background: '#22c55e' }} />
+      {data.label}
+      <Handle type="source" position={Position.Bottom} style={{ background: '#22c55e' }} />
+    </div>
+  );
+}
+
+function ParallelogramNode({ data, selected }: NodeProps) {
+  return (
+    <div style={{
+      padding: '10px 28px', minWidth: '120px', textAlign: 'center',
+      background: selected ? '#1e1b4b' : '#0f172a',
+      border: `2px solid ${selected ? '#818cf8' : '#3730a3'}`,
+      color: '#c7d2fe', fontSize: '13px', fontWeight: 500,
+      transform: 'skewX(-15deg)',
+      boxShadow: selected ? '0 0 0 3px rgba(129,140,248,0.25)' : '0 2px 6px rgba(0,0,0,0.3)',
+    }}>
+      <Handle type="target" position={Position.Top} style={{ background: '#818cf8' }} />
+      <span style={{ display: 'inline-block', transform: 'skewX(15deg)' }}>{data.label}</span>
+      <Handle type="source" position={Position.Bottom} style={{ background: '#818cf8' }} />
+    </div>
+  );
+}
+
+const nodeTypes = {
+  rectangle: RectangleNode,
+  diamond: DiamondNode,
+  circle: CircleNode,
+  parallelogram: ParallelogramNode,
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// NODE OPTIONS
+// ─────────────────────────────────────────────────────────────────────────────
+
+const NODE_OPTIONS = [
+  { type: 'rectangle',     emoji: '▭', name: 'Process',    color: '#3b82f6' },
+  { type: 'diamond',       emoji: '◇', name: 'Decision',   color: '#f59e0b' },
+  { type: 'circle',        emoji: '○', name: 'Start/End',  color: '#22c55e' },
+  { type: 'parallelogram', emoji: '▱', name: 'Input/Out',  color: '#818cf8' },
+];
+
+// ─────────────────────────────────────────────────────────────────────────────
+// NODE TYPE PICKER
+// ─────────────────────────────────────────────────────────────────────────────
+
+function NodeTypePicker({ onSelect, onClose }: { onSelect: (type: string) => void; onClose: () => void }) {
+  return (
+    <>
+      <div onClick={onClose} style={{ position: 'fixed', inset: 0, zIndex: 40 }} />
+      <div style={{
+        position: 'absolute', top: '40px', left: 0,
+        background: '#1e293b', border: '1px solid #334155',
+        borderRadius: '12px', padding: '10px',
+        zIndex: 50, display: 'flex', gap: '6px',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+      }}>
+        {NODE_OPTIONS.map(opt => (
+          <button key={opt.type} onClick={() => { onSelect(opt.type); onClose(); }}
+            style={{
+              padding: '8px 12px', borderRadius: '8px',
+              border: `1px solid #334155`, background: '#0f172a',
+              color: '#f8fafc', cursor: 'pointer', textAlign: 'center',
+              fontSize: '11px', minWidth: '64px',
+            }}
+          >
+            <div style={{ fontSize: '18px', color: opt.color, marginBottom: '3px' }}>{opt.emoji}</div>
+            <div style={{ fontWeight: 600 }}>{opt.name}</div>
+          </button>
+        ))}
+      </div>
+    </>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// AI PANEL
+// ─────────────────────────────────────────────────────────────────────────────
+
+function AIPanel({ onGenerate, onClose, generating }: {
+  onGenerate: (prompt: string) => void;
+  onClose: () => void;
+  generating: boolean;
+}) {
+  const [prompt, setPrompt] = useState('');
+  const examples = ['User login flow', 'E-commerce checkout', 'Bug reporting process', 'Employee onboarding'];
+
+  return (
+    <>
+      <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 40 }} />
+      <div style={{
+        position: 'fixed', bottom: '24px', left: '50%',
+        transform: 'translateX(-50%)',
+        width: '320px', background: '#0f172a',
+        border: '1px solid #334155', borderRadius: '16px',
+        padding: '20px', zIndex: 50,
+        boxShadow: '0 16px 48px rgba(0,0,0,0.6)',
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+          <span style={{ color: '#f8fafc', fontWeight: 700, fontSize: '15px', display: 'flex', alignItems: 'center', gap: '7px' }}>
+            <Sparkles size={16} color="#a78bfa" /> AI Flow Generator
+          </span>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#64748b', fontSize: '20px', cursor: 'pointer' }}>×</button>
+        </div>
+
+        <textarea
+          value={prompt}
+          onChange={e => setPrompt(e.target.value)}
+          placeholder="Describe your flow... e.g. 'User registration with email verification'"
+          style={{
+            width: '100%', height: '85px', padding: '10px 12px',
+            borderRadius: '8px', border: '1px solid #334155',
+            background: '#1e293b', color: '#f8fafc', fontSize: '13px',
+            resize: 'none', outline: 'none', fontFamily: 'inherit',
+            boxSizing: 'border-box',
+          }}
+        />
+
+        <div style={{ marginTop: '10px', marginBottom: '12px' }}>
+          <div style={{ color: '#64748b', fontSize: '11px', marginBottom: '5px' }}>Quick examples:</div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
+            {examples.map(ex => (
+              <button key={ex} onClick={() => setPrompt(ex)} style={{
+                padding: '3px 9px', borderRadius: '20px',
+                border: '1px solid #334155', background: '#1e293b',
+                color: '#94a3b8', fontSize: '11px', cursor: 'pointer',
+              }}>{ex}</button>
+            ))}
+          </div>
+        </div>
+
+        <button
+          onClick={() => prompt.trim() && onGenerate(prompt)}
+          disabled={!prompt.trim() || generating}
+          style={{
+            width: '100%', padding: '10px', borderRadius: '8px', border: 'none',
+            background: !prompt.trim() || generating ? '#334155' : 'linear-gradient(135deg, #7c3aed, #4f46e5)',
+            color: '#fff', fontSize: '14px', fontWeight: 600,
+            cursor: !prompt.trim() || generating ? 'not-allowed' : 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '7px',
+          }}
+        >
+          {generating
+            ? <><Loader size={15} style={{ animation: 'spin 1s linear infinite' }} /> Generating...</>
+            : <><Sparkles size={15} /> Generate Flow</>
+          }
+        </button>
+      </div>
+    </>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TOAST
+// ─────────────────────────────────────────────────────────────────────────────
+
+function Toast({ message, type }: { message: string; type: 'success' | 'error' }) {
+  return (
+    <div style={{
+      position: 'fixed', bottom: '24px', left: '50%',
+      transform: 'translateX(-50%)', zIndex: 9999,
+      display: 'flex', alignItems: 'center', gap: '8px',
+      padding: '12px 20px', borderRadius: '10px',
+      background: type === 'success' ? '#166534' : '#991b1b',
+      color: '#fff', fontSize: '14px', fontWeight: 600,
+      boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
+    }}>
+      {type === 'success' ? <CheckCircle size={16} /> : <XCircle size={16} />}
+      {message}
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// BUTTON STYLE HELPER
+// ─────────────────────────────────────────────────────────────────────────────
+
+function btnStyle(bg: string, border: string, color = '#f1f5f9') {
+  return {
+    display: 'flex' as const, alignItems: 'center' as const, gap: '5px',
+    padding: '6px 11px', borderRadius: '7px',
+    border: `1px solid ${border}`, background: bg,
+    color, fontSize: '12px', fontWeight: 600,
+    cursor: 'pointer', whiteSpace: 'nowrap' as const,
+  };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// INITIAL NODES
+// ─────────────────────────────────────────────────────────────────────────────
+
+const initialNodes: Node[] = [
+  { id: '1', type: 'circle', data: { label: 'Start' }, position: { x: 250, y: 25 } },
+];
+
+// ─────────────────────────────────────────────────────────────────────────────
+// MAIN COMPONENT
+// ─────────────────────────────────────────────────────────────────────────────
+
 export function FlowEditor() {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -71,43 +286,35 @@ export function FlowEditor() {
   const [currentFlowId, setCurrentFlowId] = useState<string | null>(null);
   const [flows, setFlows] = useState<Flow[]>([]);
   const [showLoadMenu, setShowLoadMenu] = useState(false);
+  const [showNodePicker, setShowNodePicker] = useState(false);
+  const [showAIPanel, setShowAIPanel] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [generating, setGenerating] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const { signOut, user } = useAuth();
 
-  // ── Show toast helper ────────────────────────────────────────────────────
   const showToast = (message: string, type: 'success' | 'error') => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 2500);
   };
 
   const onConnect = useCallback(
-    (params: Connection | Edge) => setEdges((eds) => addEdge(params, eds)),
+    (params: Connection | Edge) => setEdges(eds => addEdge(params, eds)),
     [setEdges]
   );
 
-  // ── Load all flows list ──────────────────────────────────────────────────
   const loadFlows = async () => {
     const { data, error } = await supabase
-      .from('flows')
-      .select('*')
-      .order('updated_at', { ascending: false });
-
-    if (!error && data) {
-      setFlows(data);
-    }
+      .from('flows').select('*').order('updated_at', { ascending: false });
+    if (!error && data) setFlows(data);
   };
 
-  // ── Auto-load last edited flow on login ──────────────────────────────────
   useEffect(() => {
     const autoLoad = async () => {
       const { data, error } = await supabase
-        .from('flows')
-        .select('*')
+        .from('flows').select('*')
         .order('updated_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
+        .limit(1).maybeSingle();
       if (!error && data) {
         setNodes(data.data.nodes || []);
         setEdges(data.data.edges || []);
@@ -115,12 +322,10 @@ export function FlowEditor() {
         setCurrentFlowId(data.id);
       }
     };
-
     autoLoad();
     loadFlows();
   }, []);
 
-  // ── Ctrl+S keyboard shortcut ─────────────────────────────────────────────
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 's') {
@@ -132,53 +337,26 @@ export function FlowEditor() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [nodes, edges, flowName, currentFlowId, user]);
 
-  // ── Save / Update flow ───────────────────────────────────────────────────
   const handleSave = async () => {
     if (!user) return;
-
     setSaving(true);
     const flowData = { nodes, edges };
-
     if (currentFlowId) {
-      const { error } = await supabase
-        .from('flows')
-        .update({
-          name: flowName,
-          data: flowData,
-          updated_at: new Date().toISOString(),
-        })
+      const { error } = await supabase.from('flows')
+        .update({ name: flowName, data: flowData, updated_at: new Date().toISOString() })
         .eq('id', currentFlowId);
-
-      if (!error) {
-        await loadFlows();
-        showToast('Flow saved!', 'success');
-      } else {
-        showToast('Save failed. Try again.', 'error');
-      }
+      if (!error) { await loadFlows(); showToast('Flow saved! ✓', 'success'); }
+      else showToast('Save failed!', 'error');
     } else {
-      const { data, error } = await supabase
-        .from('flows')
-        .insert({
-          user_id: user.id,
-          name: flowName,
-          data: flowData,
-        })
-        .select()
-        .maybeSingle();
-
-      if (!error && data) {
-        setCurrentFlowId(data.id);
-        await loadFlows();
-        showToast('Flow saved!', 'success');
-      } else {
-        showToast('Save failed. Try again.', 'error');
-      }
+      const { data, error } = await supabase.from('flows')
+        .insert({ user_id: user.id, name: flowName, data: flowData })
+        .select().maybeSingle();
+      if (!error && data) { setCurrentFlowId(data.id); await loadFlows(); showToast('Flow saved! ✓', 'success'); }
+      else showToast('Save failed!', 'error');
     }
-
     setSaving(false);
   };
 
-  // ── Load selected flow ───────────────────────────────────────────────────
   const handleLoad = (flow: Flow) => {
     setNodes(flow.data.nodes || []);
     setEdges(flow.data.edges || []);
@@ -187,7 +365,6 @@ export function FlowEditor() {
     setShowLoadMenu(false);
   };
 
-  // ── Delete flow ──────────────────────────────────────────────────────────
   const handleDelete = async (flowId: string) => {
     await supabase.from('flows').delete().eq('id', flowId);
     await loadFlows();
@@ -199,7 +376,6 @@ export function FlowEditor() {
     }
   };
 
-  // ── New flow ─────────────────────────────────────────────────────────────
   const handleNew = () => {
     setCurrentFlowId(null);
     setFlowName('Untitled Flow');
@@ -207,141 +383,132 @@ export function FlowEditor() {
     setEdges([]);
   };
 
-  // ── Add node ─────────────────────────────────────────────────────────────
-  const addNode = () => {
-    const newNode: Node = {
-      id: `${nodes.length + 1}`,
-      data: { label: `Node ${nodes.length + 1}` },
-      position: {
-        x: Math.random() * 400 + 100,
-        y: Math.random() * 400 + 100,
-      },
+  const addNode = (type: string = 'rectangle') => {
+    const labels: Record<string, string> = {
+      rectangle: 'Process', diamond: 'Decision?',
+      circle: 'Start/End', parallelogram: 'Input/Output',
     };
-    setNodes((nds) => [...nds, newNode]);
+    const newNode: Node = {
+      id: `${Date.now()}`, type,
+      data: { label: labels[type] || 'Node' },
+      position: { x: Math.random() * 300 + 80, y: Math.random() * 300 + 80 },
+    };
+    setNodes(nds => [...nds, newNode]);
   };
 
-  // ── Render ───────────────────────────────────────────────────────────────
+  const handleAIGenerate = async (prompt: string) => {
+    setGenerating(true);
+    setShowAIPanel(false);
+    try {
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1000,
+          messages: [{
+            role: 'user',
+            content: `Create a flowchart for: "${prompt}"
+
+Return ONLY valid JSON, no explanation, no markdown backticks:
+{
+  "flowName": "short descriptive name",
+  "nodes": [
+    { "id": "1", "type": "circle", "data": { "label": "Start" }, "position": { "x": 250, "y": 50 } },
+    { "id": "2", "type": "rectangle", "data": { "label": "Step" }, "position": { "x": 250, "y": 170 } },
+    { "id": "3", "type": "diamond", "data": { "label": "Decision?" }, "position": { "x": 250, "y": 290 } },
+    { "id": "4", "type": "circle", "data": { "label": "End" }, "position": { "x": 250, "y": 430 } }
+  ],
+  "edges": [
+    { "id": "e1-2", "source": "1", "target": "2" },
+    { "id": "e2-3", "source": "2", "target": "3" },
+    { "id": "e3-4", "source": "3", "target": "4" }
+  ]
+}
+Node types: circle=start/end, rectangle=process, diamond=decision, parallelogram=input/output
+Space nodes: y += 120 per step, x center ~250. Use 4-8 nodes. Return ONLY JSON.`
+          }]
+        })
+      });
+      const data = await response.json();
+      const text = data.content?.[0]?.text || '';
+      const clean = text.replace(/```json|```/g, '').trim();
+      const parsed = JSON.parse(clean);
+      setNodes(parsed.nodes || []);
+      setEdges(parsed.edges || []);
+      setFlowName(parsed.flowName || prompt);
+      setCurrentFlowId(null);
+      showToast('AI flow generated! 🎉', 'success');
+    } catch (err) {
+      console.error('AI error:', err);
+      showToast('AI generation failed. Try again!', 'error');
+    }
+    setGenerating(false);
+  };
+
+  const onNodeDoubleClick = useCallback((_: React.MouseEvent, node: Node) => {
+    const newLabel = window.prompt('Edit label:', node.data.label);
+    if (newLabel !== null && newLabel.trim()) {
+      setNodes(nds => nds.map(n =>
+        n.id === node.id ? { ...n, data: { ...n.data, label: newLabel.trim() } } : n
+      ));
+    }
+  }, [setNodes]);
+
   return (
-    <div className="h-screen flex flex-col">
-      <header className="bg-slate-900 text-white px-6 py-4 shadow-lg">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <h1 className="text-2xl font-bold tracking-tight">FLOW.CRAFT</h1>
-            <input
-              type="text"
-              value={flowName}
-              onChange={(e) => setFlowName(e.target.value)}
-              className="bg-slate-800 px-4 py-2 rounded-lg border border-slate-700 focus:border-slate-500 focus:outline-none"
-              placeholder="Flow name"
-            />
-          </div>
+    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: '#020617' }}>
 
-          <div className="flex items-center gap-2">
-            <button
-              onClick={handleNew}
-              className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors"
-            >
-              <Plus className="w-4 h-4" />
-              New
-            </button>
-            <button
-              onClick={addNode}
-              className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors"
-            >
-              <Plus className="w-4 h-4" />
-              Add Node
-            </button>
-            <button
-              onClick={handleSave}
-              disabled={saving}
-              className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg transition-colors disabled:opacity-50"
-              title="Save (Ctrl+S)"
-            >
-              <Save className="w-4 h-4" />
-              {saving ? 'Saving...' : 'Save'}
-            </button>
-            <button
-              onClick={() => { setShowLoadMenu(!showLoadMenu); if (!showLoadMenu) loadFlows(); }}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
-            >
-              <FolderOpen className="w-4 h-4" />
-              Load
-            </button>
-            <button
-              onClick={signOut}
-              className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
-            >
-              <LogOut className="w-4 h-4" />
-              Sign Out
-            </button>
-          </div>
-        </div>
-      </header>
+      {/* ── Navbar ── */}
+      <header style={{ background: '#0f172a', borderBottom: '1px solid #1e293b', padding: '10px 14px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+          <span style={{ fontWeight: 800, color: '#f8fafc', fontSize: '17px', letterSpacing: '-0.5px', marginRight: '4px' }}>
+            FLOW.CRAFT
+          </span>
 
-      <div className="flex-1 relative">
-        <ReactFlow
-          nodes={nodes}
-          edges={edges}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onConnect={onConnect}
-          fitView
-        >
-          <Controls />
-          <MiniMap />
-          <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
-        </ReactFlow>
+          <input
+            type="text" value={flowName}
+            onChange={e => setFlowName(e.target.value)}
+            style={{
+              background: '#1e293b', border: '1px solid #334155',
+              borderRadius: '7px', padding: '5px 10px',
+              color: '#f8fafc', fontSize: '12px', outline: 'none', width: '130px',
+            }}
+          />
 
-        {/* ── Load Menu ── */}
-        {showLoadMenu && (
-          <div className="absolute top-4 right-4 bg-white rounded-lg shadow-2xl p-4 w-80 max-h-96 overflow-y-auto z-50">
-            <h3 className="text-lg font-semibold mb-3 text-slate-900">Your Flows</h3>
-            {flows.length === 0 ? (
-              <p className="text-slate-500 text-sm">No saved flows yet</p>
-            ) : (
-              <div className="space-y-2">
-                {flows.map((flow) => (
-                  <div
-                    key={flow.id}
-                    className={`flex items-center justify-between p-3 border rounded-lg transition-colors ${
-                      currentFlowId === flow.id
-                        ? 'border-blue-400 bg-blue-50'
-                        : 'border-slate-200 hover:border-slate-300'
-                    }`}
-                  >
-                    <button
-                      onClick={() => handleLoad(flow)}
-                      className="flex-1 text-left"
-                    >
-                      <div className="font-medium text-slate-900">
-                        {currentFlowId === flow.id && (
-                          <span className="text-blue-500 mr-1">●</span>
-                        )}
-                        {flow.name}
-                      </div>
-                      <div className="text-xs text-slate-500">
-                        {new Date(flow.updated_at).toLocaleDateString('en-IN', {
-                          day: 'numeric', month: 'short', year: 'numeric',
-                          hour: '2-digit', minute: '2-digit',
-                        })}
-                      </div>
-                    </button>
-                    <button
-                      onClick={() => handleDelete(flow.id)}
-                      className="ml-2 p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                ))}
-              </div>
+          <button onClick={handleNew} style={btnStyle('#1e293b', '#334155')}>
+            <Plus size={13} /> New
+          </button>
+
+          <div style={{ position: 'relative' }}>
+            <button onClick={() => setShowNodePicker(p => !p)} style={btnStyle('#1e293b', '#334155')}>
+              <Plus size={13} /> Add Node ▾
+            </button>
+            {showNodePicker && (
+              <NodeTypePicker onSelect={addNode} onClose={() => setShowNodePicker(false)} />
             )}
           </div>
-        )}
-      </div>
 
-      {/* ── Toast ── */}
-      {toast && <Toast message={toast.message} type={toast.type} />}
-    </div>
-  );
-    }
+          <button onClick={() => setShowAIPanel(true)} disabled={generating}
+            style={btnStyle('#2e1065', '#7c3aed', '#e9d5ff')}>
+            {generating
+              ? <Loader size={13} style={{ animation: 'spin 1s linear infinite' }} />
+              : <Sparkles size={13} />}
+            {generating ? 'Generating...' : 'AI Generate'}
+          </button>
+
+          <button onClick={handleSave} disabled={saving} style={btnStyle('#14532d', '#16a34a')}>
+            <Save size={13} /> {saving ? 'Saving...' : 'Save'}
+          </button>
+
+          <button onClick={() => { setShowLoadMenu(p => !p); loadFlows(); }} style={btnStyle('#1e3a8a', '#2563eb')}>
+            <FolderOpen size={13} /> Load
+          </button>
+
+          <button onClick={signOut} style={btnStyle('#7f1d1d', '#dc2626')}>
+            <LogOut size={13} /> Out
+          </button>
+        </div>
+
+        {/* Legend */}
+        <div style={{ display: 'flex', gap: '10px', marginTop: '7px', flexWrap: 'wrap' }}>
+          {NODE_OPTIONS.map(opt =>
