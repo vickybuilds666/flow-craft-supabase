@@ -1,4 +1,4 @@
-import type { Handler } from '@netlify/functions';
+const handler = async (event: any) => {
 
 export const handler: Handler = async (event) => {
   // Only POST allowed
@@ -80,3 +80,4 @@ Space nodes: y += 120 per step, x center ~250. Use 4-8 nodes. Return ONLY JSON.`
     };
   }
 };
+export { handler };
