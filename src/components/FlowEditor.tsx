@@ -400,40 +400,12 @@ export function FlowEditor() {
     setGenerating(true);
     setShowAIPanel(false);
     try {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
+      const response = await fetch('/.netlify/functions/generate-flow', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 1000,
-          messages: [{
-            role: 'user',
-            content: `Create a flowchart for: "${prompt}"
-
-Return ONLY valid JSON, no explanation, no markdown backticks:
-{
-  "flowName": "short descriptive name",
-  "nodes": [
-    { "id": "1", "type": "circle", "data": { "label": "Start" }, "position": { "x": 250, "y": 50 } },
-    { "id": "2", "type": "rectangle", "data": { "label": "Step" }, "position": { "x": 250, "y": 170 } },
-    { "id": "3", "type": "diamond", "data": { "label": "Decision?" }, "position": { "x": 250, "y": 290 } },
-    { "id": "4", "type": "circle", "data": { "label": "End" }, "position": { "x": 250, "y": 430 } }
-  ],
-  "edges": [
-    { "id": "e1-2", "source": "1", "target": "2" },
-    { "id": "e2-3", "source": "2", "target": "3" },
-    { "id": "e3-4", "source": "3", "target": "4" }
-  ]
-}
-Node types: circle=start/end, rectangle=process, diamond=decision, parallelogram=input/output
-Space nodes: y += 120 per step, x center ~250. Use 4-8 nodes. Return ONLY JSON.`
-          }]
-        })
+        body: JSON.stringify({ prompt }),
       });
-      const data = await response.json();
-      const text = data.content?.[0]?.text || '';
-      const clean = text.replace(/```json|```/g, '').trim();
-      const parsed = JSON.parse(clean);
+      const parsed = await response.json();
       setNodes(parsed.nodes || []);
       setEdges(parsed.edges || []);
       setFlowName(parsed.flowName || prompt);
@@ -511,12 +483,11 @@ Space nodes: y += 120 per step, x center ~250. Use 4-8 nodes. Return ONLY JSON.`
 
         {/* Legend */}
         <div style={{ display: 'flex', gap: '10px', marginTop: '7px', flexWrap: 'wrap' }}>
-          {NODE_OPTIONS.map(opt =>
-(
-              <span key={opt.type} style={{ fontSize: '10px', color: opt.color, display: 'flex', alignItems: 'center', gap: '3px' }}>
-                {opt.emoji} {opt.name}
-              </span>
-            ))}
+          {NODE_OPTIONS.map(opt => (
+            <span key={opt.type} style={{ fontSize: '10px', color: opt.color, display: 'flex', alignItems: 'center', gap: '3px' }}>
+              {opt.emoji} {opt.name}
+            </span>
+          ))}
           <span style={{ fontSize: '10px', color: '#475569' }}>• Double-tap node to edit label</span>
         </div>
       </header>
@@ -545,56 +516,5 @@ Space nodes: y += 120 per step, x center ~250. Use 4-8 nodes. Return ONLY JSON.`
           <Background variant={BackgroundVariant.Dots} gap={16} size={1} color="#1e293b" />
         </ReactFlow>
 
-        {showLoadMenu && (
-          <div style={{
-            position: 'absolute', top: '12px', right: '12px',
-            background: '#0f172a', border: '1px solid #1e293b',
-            borderRadius: '12px', padding: '14px',
-            width: '270px', maxHeight: '370px', overflowY: 'auto',
-            zIndex: 50, boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
-          }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
-              <span style={{ color: '#f8fafc', fontWeight: 700, fontSize: '13px' }}>📁 Your Flows</span>
-              <button onClick={() => setShowLoadMenu(false)}
-                style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: '18px' }}>×</button>
-            </div>
-            {flows.length === 0
-              ? <p style={{ color: '#475569', fontSize: '12px', textAlign: 'center', padding: '16px 0' }}>No saved flows yet</p>
-              : flows.map(flow => (
-                <div key={flow.id} style={{
-                  display: 'flex', alignItems: 'center',
-                  padding: '9px 10px', borderRadius: '8px', marginBottom: '5px',
-                  border: `1px solid ${currentFlowId === flow.id ? '#3b82f6' : '#1e293b'}`,
-                  background: currentFlowId === flow.id ? '#1e3a5f' : '#1e293b',
-                  cursor: 'pointer',
-                }}>
-                  <div onClick={() => handleLoad(flow)} style={{ flex: 1 }}>
-                    <div style={{ color: '#f1f5f9', fontWeight: 600, fontSize: '12px' }}>
-                      {currentFlowId === flow.id && <span style={{ color: '#3b82f6', marginRight: '4px' }}>●</span>}
-                      {flow.name}
-                    </div>
-                    <div style={{ color: '#475569', fontSize: '10px', marginTop: '2px' }}>
-                      {new Date(flow.updated_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
-                    </div>
-                  </div>
-                  <button onClick={() => handleDelete(flow.id)}
-                    style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '4px' }}>
-                    <Trash2 size={13} />
-                  </button>
-                </div>
-              ))
-            }
-          </div>
-        )}
-      </div>
-
-      {showAIPanel && (
-        <AIPanel onGenerate={handleAIGenerate} onClose={() => setShowAIPanel(false)} generating={generating} />
-      )}
-
-      {toast && <Toast message={toast.message} type={toast.type} />}
-
-      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
-    </div>
-  );
-}
+        {/* ── Load Menu ── */}
+    
