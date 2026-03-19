@@ -1,4 +1,4 @@
- import { useCallback, useState, useEffect } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import ReactFlow, {
   MiniMap,
   Controls,
@@ -23,10 +23,6 @@ import {
   Save, FolderOpen, LogOut, Plus, Trash2,
   CheckCircle, XCircle, Sparkles, Loader
 } from 'lucide-react';
-
-// ─────────────────────────────────────────────────────────────────────────────
-// CUSTOM NODES
-// ─────────────────────────────────────────────────────────────────────────────
 
 function RectangleNode({ data, selected }: NodeProps) {
   return (
@@ -113,20 +109,12 @@ const nodeTypes = {
   parallelogram: ParallelogramNode,
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
-// NODE OPTIONS
-// ─────────────────────────────────────────────────────────────────────────────
-
 const NODE_OPTIONS = [
   { type: 'rectangle',     emoji: '▭', name: 'Process',    color: '#3b82f6' },
   { type: 'diamond',       emoji: '◇', name: 'Decision',   color: '#f59e0b' },
   { type: 'circle',        emoji: '○', name: 'Start/End',  color: '#22c55e' },
   { type: 'parallelogram', emoji: '▱', name: 'Input/Out',  color: '#818cf8' },
 ];
-
-// ─────────────────────────────────────────────────────────────────────────────
-// NODE TYPE PICKER
-// ─────────────────────────────────────────────────────────────────────────────
 
 function NodeTypePicker({ onSelect, onClose }: { onSelect: (type: string) => void; onClose: () => void }) {
   return (
@@ -143,7 +131,7 @@ function NodeTypePicker({ onSelect, onClose }: { onSelect: (type: string) => voi
           <button key={opt.type} onClick={() => { onSelect(opt.type); onClose(); }}
             style={{
               padding: '8px 12px', borderRadius: '8px',
-              border: `1px solid #334155`, background: '#0f172a',
+              border: '1px solid #334155', background: '#0f172a',
               color: '#f8fafc', cursor: 'pointer', textAlign: 'center',
               fontSize: '11px', minWidth: '64px',
             }}
@@ -156,10 +144,6 @@ function NodeTypePicker({ onSelect, onClose }: { onSelect: (type: string) => voi
     </>
   );
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// AI PANEL
-// ─────────────────────────────────────────────────────────────────────────────
 
 function AIPanel({ onGenerate, onClose, generating }: {
   onGenerate: (prompt: string) => void;
@@ -184,13 +168,12 @@ function AIPanel({ onGenerate, onClose, generating }: {
           <span style={{ color: '#f8fafc', fontWeight: 700, fontSize: '15px', display: 'flex', alignItems: 'center', gap: '7px' }}>
             <Sparkles size={16} color="#a78bfa" /> AI Flow Generator
           </span>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#64748b', fontSize: '20px', cursor: 'pointer' }}>×</button>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#64748b', fontSize: '20px', cursor: 'pointer' }}>x</button>
         </div>
-
         <textarea
           value={prompt}
           onChange={e => setPrompt(e.target.value)}
-          placeholder="Describe your flow... e.g. 'User registration with email verification'"
+          placeholder="Describe your flow..."
           style={{
             width: '100%', height: '85px', padding: '10px 12px',
             borderRadius: '8px', border: '1px solid #334155',
@@ -199,7 +182,6 @@ function AIPanel({ onGenerate, onClose, generating }: {
             boxSizing: 'border-box',
           }}
         />
-
         <div style={{ marginTop: '10px', marginBottom: '12px' }}>
           <div style={{ color: '#64748b', fontSize: '11px', marginBottom: '5px' }}>Quick examples:</div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
@@ -212,7 +194,6 @@ function AIPanel({ onGenerate, onClose, generating }: {
             ))}
           </div>
         </div>
-
         <button
           onClick={() => prompt.trim() && onGenerate(prompt)}
           disabled={!prompt.trim() || generating}
@@ -234,10 +215,6 @@ function AIPanel({ onGenerate, onClose, generating }: {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// TOAST
-// ─────────────────────────────────────────────────────────────────────────────
-
 function Toast({ message, type }: { message: string; type: 'success' | 'error' }) {
   return (
     <div style={{
@@ -255,10 +232,6 @@ function Toast({ message, type }: { message: string; type: 'success' | 'error' }
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// BUTTON STYLE HELPER
-// ─────────────────────────────────────────────────────────────────────────────
-
 function btnStyle(bg: string, border: string, color = '#f1f5f9') {
   return {
     display: 'flex' as const, alignItems: 'center' as const, gap: '5px',
@@ -269,17 +242,9 @@ function btnStyle(bg: string, border: string, color = '#f1f5f9') {
   };
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// INITIAL NODES
-// ─────────────────────────────────────────────────────────────────────────────
-
 const initialNodes: Node[] = [
-  { id: '1', type: 'circle', data: { label: 'Start' }, position: { x: 250, y: 25 } },
+  { id: '1', type: 'circle', data: { label: 'Start' }, position: { x: 100, y: 100 } },
 ];
-
-// ─────────────────────────────────────────────────────────────────────────────
-// MAIN COMPONENT
-// ─────────────────────────────────────────────────────────────────────────────
 
 function FlowEditorInner() {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
@@ -294,8 +259,9 @@ function FlowEditorInner() {
   const [generating, setGenerating] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const { signOut, user } = useAuth();
-
   const { fitView } = useReactFlow();
+
+  const showToast = (message: string, type: 'success' | 'error') => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 2500);
   };
@@ -347,13 +313,13 @@ function FlowEditorInner() {
       const { error } = await supabase.from('flows')
         .update({ name: flowName, data: flowData, updated_at: new Date().toISOString() })
         .eq('id', currentFlowId);
-      if (!error) { await loadFlows(); showToast('Flow saved! ✓', 'success'); }
+      if (!error) { await loadFlows(); showToast('Flow saved!', 'success'); }
       else showToast('Save failed!', 'error');
     } else {
       const { data, error } = await supabase.from('flows')
         .insert({ user_id: user.id, name: flowName, data: flowData })
         .select().maybeSingle();
-      if (!error && data) { setCurrentFlowId(data.id); await loadFlows(); showToast('Flow saved! ✓', 'success'); }
+      if (!error && data) { setCurrentFlowId(data.id); await loadFlows(); showToast('Flow saved!', 'success'); }
       else showToast('Save failed!', 'error');
     }
     setSaving(false);
@@ -393,7 +359,7 @@ function FlowEditorInner() {
     const newNode: Node = {
       id: `${Date.now()}`, type,
       data: { label: labels[type] || 'Node' },
-      position: { x: Math.random() * 300 + 80, y: Math.random() * 300 + 80 },
+      position: { x: 100, y: 100 },
     };
     setNodes(nds => [...nds, newNode]);
   };
@@ -408,13 +374,16 @@ function FlowEditorInner() {
         body: JSON.stringify({ prompt }),
       });
       const parsed = await response.json();
-     const fixedNodes=(parsed.nodes||[]).map((n,i)=>({...n,position:{x:50,y:50+i*100}}));setNodes(fixedNodes);
-setNodes(fixedNodes);
+      const fixedNodes = (parsed.nodes || []).map((n: Node, i: number) => ({
+        ...n,
+        position: { x: 100, y: i * 120 },
+      }));
+      setNodes(fixedNodes);
       setEdges(parsed.edges || []);
       setFlowName(parsed.flowName || prompt);
       setCurrentFlowId(null);
-      setTimeout(() => fitView({ padding: 0.2, duration: 500, includeHiddenNodes: true }), 500);
-      setTimeout(() => fitView({ duration: 500 }), 100);
+      showToast('AI flow generated!', 'success');
+      setTimeout(() => fitView({ padding: 0.3, duration: 500 }), 300);
     } catch (err) {
       console.error('AI error:', err);
       showToast('AI generation failed. Try again!', 'error');
@@ -433,14 +402,11 @@ setNodes(fixedNodes);
 
   return (
     <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: '#020617' }}>
-
-      {/* ── Navbar ── */}
       <header style={{ background: '#0f172a', borderBottom: '1px solid #1e293b', padding: '10px 14px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
           <span style={{ fontWeight: 800, color: '#f8fafc', fontSize: '17px', letterSpacing: '-0.5px', marginRight: '4px' }}>
             FLOW.CRAFT
           </span>
-
           <input
             type="text" value={flowName}
             onChange={e => setFlowName(e.target.value)}
@@ -450,53 +416,42 @@ setNodes(fixedNodes);
               color: '#f8fafc', fontSize: '12px', outline: 'none', width: '130px',
             }}
           />
-
           <button onClick={handleNew} style={btnStyle('#1e293b', '#334155')}>
             <Plus size={13} /> New
           </button>
-
           <div style={{ position: 'relative' }}>
             <button onClick={() => setShowNodePicker(p => !p)} style={btnStyle('#1e293b', '#334155')}>
-              <Plus size={13} /> Add Node ▾
+              <Plus size={13} /> Add Node
             </button>
             {showNodePicker && (
               <NodeTypePicker onSelect={addNode} onClose={() => setShowNodePicker(false)} />
             )}
           </div>
-
           <button onClick={() => setShowAIPanel(true)} disabled={generating}
             style={btnStyle('#2e1065', '#7c3aed', '#e9d5ff')}>
-            {generating
-              ? <Loader size={13} style={{ animation: 'spin 1s linear infinite' }} />
-              : <Sparkles size={13} />}
+            {generating ? <Loader size={13} style={{ animation: 'spin 1s linear infinite' }} /> : <Sparkles size={13} />}
             {generating ? 'Generating...' : 'AI Generate'}
           </button>
-
           <button onClick={handleSave} disabled={saving} style={btnStyle('#14532d', '#16a34a')}>
             <Save size={13} /> {saving ? 'Saving...' : 'Save'}
           </button>
-
           <button onClick={() => { setShowLoadMenu(p => !p); loadFlows(); }} style={btnStyle('#1e3a8a', '#2563eb')}>
             <FolderOpen size={13} /> Load
           </button>
-
           <button onClick={signOut} style={btnStyle('#7f1d1d', '#dc2626')}>
             <LogOut size={13} /> Out
           </button>
         </div>
-
-        {/* Legend */}
         <div style={{ display: 'flex', gap: '10px', marginTop: '7px', flexWrap: 'wrap' }}>
           {NODE_OPTIONS.map(opt => (
             <span key={opt.type} style={{ fontSize: '10px', color: opt.color, display: 'flex', alignItems: 'center', gap: '3px' }}>
               {opt.emoji} {opt.name}
             </span>
           ))}
-          <span style={{ fontSize: '10px', color: '#475569' }}>• Double-tap node to edit label</span>
+          <span style={{ fontSize: '10px', color: '#475569' }}>Double-tap to edit label</span>
         </div>
       </header>
 
-      {/* ── Canvas ── */}
       <div style={{ flex: 1, position: 'relative' }}>
         <ReactFlow
           nodes={nodes} edges={edges}
@@ -506,6 +461,8 @@ setNodes(fixedNodes);
           onNodeDoubleClick={onNodeDoubleClick}
           nodeTypes={nodeTypes}
           fitView
+          fitViewOptions={{ padding: 0.3 }}
+          minZoom={0.1}
         >
           <Controls />
           <MiniMap
@@ -518,9 +475,6 @@ setNodes(fixedNodes);
             style={{ background: '#1e293b', border: '1px solid #334155' }}
           />
           <Background variant={BackgroundVariant.Dots} gap={16} size={1} color="#1e293b" />
-          
-
-    
         </ReactFlow>
 
         {showLoadMenu && (
@@ -532,9 +486,9 @@ setNodes(fixedNodes);
             zIndex: 50, boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
-              <span style={{ color: '#f8fafc', fontWeight: 700, fontSize: '13px' }}>📁 Your Flows</span>
+              <span style={{ color: '#f8fafc', fontWeight: 700, fontSize: '13px' }}>Your Flows</span>
               <button onClick={() => setShowLoadMenu(false)}
-                style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: '18px' }}>×</button>
+                style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: '18px' }}>x</button>
             </div>
             {flows.length === 0
               ? <p style={{ color: '#475569', fontSize: '12px', textAlign: 'center', padding: '16px 0' }}>No saved flows yet</p>
@@ -544,42 +498,4 @@ setNodes(fixedNodes);
                   padding: '9px 10px', borderRadius: '8px', marginBottom: '5px',
                   border: `1px solid ${currentFlowId === flow.id ? '#3b82f6' : '#1e293b'}`,
                   background: currentFlowId === flow.id ? '#1e3a5f' : '#1e293b',
-                }}>
-                  <div onClick={() => handleLoad(flow)} style={{ flex: 1 }}>
-                    <div style={{ color: '#f1f5f9', fontWeight: 600, fontSize: '12px' }}>
-                      {currentFlowId === flow.id && <span style={{ color: '#3b82f6', marginRight: '4px' }}>●</span>}
-                      {flow.name}
-                    </div>
-                    <div style={{ color: '#475569', fontSize: '10px', marginTop: '2px' }}>
-                      {new Date(flow.updated_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
-                    </div>
-                  </div>
-                  <button onClick={() => handleDelete(flow.id)}
-                    style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '4px' }}>
-                    <Trash2 size={13} />
-                  </button>
-                </div>
-              ))
-            }
-          </div>
-        )}
-      </div>
-
-      {showAIPanel && (
-        <AIPanel onGenerate={handleAIGenerate} onClose={() => setShowAIPanel(false)} generating={generating} />
-      )}
-
-      {toast && <Toast message={toast.message} type={toast.type} />}
-
-      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
-    </div>
-  );
-}
-
-export function FlowEditor() {
-  return (
-    <ReactFlowProvider>
-      <FlowEditorInner />
-    </ReactFlowProvider>
-  );
-                 }      
+        
