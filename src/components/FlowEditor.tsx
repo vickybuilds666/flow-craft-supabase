@@ -530,4 +530,10 @@ function FlowEditorInner() {
     </div>
   );
                   }
-                  
+    export function FlowEditor() {
+  return (
+    <ReactFlowProvider>
+      <FlowEditorInner />
+    </ReactFlowProvider>
+  );
+    }              
