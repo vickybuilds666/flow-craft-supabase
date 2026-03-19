@@ -498,7 +498,7 @@ function FlowEditorInner() {
                   padding: '9px 10px', borderRadius: '8px', marginBottom: '5px',
                   border: `1px solid ${currentFlowId === flow.id ? '#3b82f6' : '#1e293b'}`,
                   background: currentFlowId === flow.id ? '#1e3a5f' : '#1e293b',
-       'pointer',
+       cursor: 'pointer',
                 }}>
                   <div onClick={() => handleLoad(flow)} style={{ flex: 1 }}>
                     <div style={{ color: '#f1f5f9', fontWeight: 600, fontSize: '12px' }}>
