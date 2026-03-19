@@ -520,4 +520,66 @@ setNodes(fixedNodes);
           <Background variant={BackgroundVariant.Dots} gap={16} size={1} color="#1e293b" /
           
 
-          
+    />
+        </ReactFlow>
+
+        {showLoadMenu && (
+          <div style={{
+            position: 'absolute', top: '12px', right: '12px',
+            background: '#0f172a', border: '1px solid #1e293b',
+            borderRadius: '12px', padding: '14px',
+            width: '270px', maxHeight: '370px', overflowY: 'auto',
+            zIndex: 50, boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+              <span style={{ color: '#f8fafc', fontWeight: 700, fontSize: '13px' }}>📁 Your Flows</span>
+              <button onClick={() => setShowLoadMenu(false)}
+                style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: '18px' }}>×</button>
+            </div>
+            {flows.length === 0
+              ? <p style={{ color: '#475569', fontSize: '12px', textAlign: 'center', padding: '16px 0' }}>No saved flows yet</p>
+              : flows.map(flow => (
+                <div key={flow.id} style={{
+                  display: 'flex', alignItems: 'center',
+                  padding: '9px 10px', borderRadius: '8px', marginBottom: '5px',
+                  border: `1px solid ${currentFlowId === flow.id ? '#3b82f6' : '#1e293b'}`,
+                  background: currentFlowId === flow.id ? '#1e3a5f' : '#1e293b',
+                }}>
+                  <div onClick={() => handleLoad(flow)} style={{ flex: 1 }}>
+                    <div style={{ color: '#f1f5f9', fontWeight: 600, fontSize: '12px' }}>
+                      {currentFlowId === flow.id && <span style={{ color: '#3b82f6', marginRight: '4px' }}>●</span>}
+                      {flow.name}
+                    </div>
+                    <div style={{ color: '#475569', fontSize: '10px', marginTop: '2px' }}>
+                      {new Date(flow.updated_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                    </div>
+                  </div>
+                  <button onClick={() => handleDelete(flow.id)}
+                    style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '4px' }}>
+                    <Trash2 size={13} />
+                  </button>
+                </div>
+              ))
+            }
+          </div>
+        )}
+      </div>
+
+      {showAIPanel && (
+        <AIPanel onGenerate={handleAIGenerate} onClose={() => setShowAIPanel(false)} generating={generating} />
+      )}
+
+      {toast && <Toast message={toast.message} type={toast.type} />}
+
+      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
+    </div>
+  );
+}
+
+export function FlowEditor() {
+  return (
+    <ReactFlowProvider>
+      <FlowEditorInner />
+    </ReactFlowProvider>
+  );
+                 }      
