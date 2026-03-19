@@ -408,7 +408,7 @@ function FlowEditorInner() {
         body: JSON.stringify({ prompt }),
       });
       const parsed = await response.json();
-      const fixedNodes = (parsed.nodes || []).map((n, i) => ({...n, position: {x: 50, y: 50 + i * 100}}));
+     const fixedNodes=(parsed.nodes||[]).map((n,i)=>({...n,position:{x:50,y:50+i*100}}));setNodes(fixedNodes);
 setNodes(fixedNodes);
       setEdges(parsed.edges || []);
       setFlowName(parsed.flowName || prompt);
