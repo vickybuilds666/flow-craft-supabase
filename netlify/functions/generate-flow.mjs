@@ -3,7 +3,7 @@ export const handler = async (event) => {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
 
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     return {
       statusCode: 500,
@@ -24,19 +24,15 @@ export const handler = async (event) => {
   }
 
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        messages: [{
-          role: 'user',
-          content: `Create a flowchart for: "${prompt}"
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{
+              text: `Create a flowchart for: "${prompt}"
 
 Return ONLY valid JSON, no explanation, no markdown backticks:
 {
@@ -54,13 +50,19 @@ Return ONLY valid JSON, no explanation, no markdown backticks:
   ]
 }
 Node types: circle=start/end, rectangle=process, diamond=decision, parallelogram=input/output
-Space nodes: y += 120 per step, x center ~250. Use 4-8 nodes. Return ONLY JSON.`,
-        }],
-      }),
-    });
+Space nodes: y += 120 per step, x center ~250. Use 4-8 nodes. Return ONLY JSON.`
+            }]
+          }],
+          generationConfig: {
+            temperature: 0.1,
+            maxOutputTokens: 1000,
+          }
+        }),
+      }
+    );
 
     const data = await response.json();
-    const text = data.content?.[0]?.text || '';
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
     const clean = text.replace(/```json|```/g, '').trim();
     const parsed = JSON.parse(clean);
 
@@ -70,7 +72,7 @@ Space nodes: y += 120 per step, x center ~250. Use 4-8 nodes. Return ONLY JSON.`
       body: JSON.stringify(parsed),
     };
   } catch (err) {
-    console.error('AI error:', err);
+    console.error('Gemini error:', err);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: 'AI generation failed' }),
