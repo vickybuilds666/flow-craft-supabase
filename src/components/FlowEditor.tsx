@@ -517,10 +517,10 @@ setNodes(fixedNodes);
             }}
             style={{ background: '#1e293b', border: '1px solid #334155' }}
           />
-          <Background variant={BackgroundVariant.Dots} gap={16} size={1} color="#1e293b" /
+          <Background variant={BackgroundVariant.Dots} gap={16} size={1} color="#1e293b" />
           
 
-    />
+    
         </ReactFlow>
 
         {showLoadMenu && (
