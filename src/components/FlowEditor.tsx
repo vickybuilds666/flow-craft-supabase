@@ -413,7 +413,7 @@ setNodes(fixedNodes);
       setEdges(parsed.edges || []);
       setFlowName(parsed.flowName || prompt);
       setCurrentFlowId(null);
-      showToast('AI flow generated! 🎉', 'success');
+      setTimeout(() => fitView({ padding: 0.2, duration: 500, includeHiddenNodes: true }), 500);
       setTimeout(() => fitView({ duration: 500 }), 100);
     } catch (err) {
       console.error('AI error:', err);
