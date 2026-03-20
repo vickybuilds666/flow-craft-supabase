@@ -70,16 +70,16 @@ const NODE_OPTIONS = [
   { type: 'rectangle', emoji: '▭', name: 'Process', color: '#3b82f6' },
   { type: 'diamond', emoji: '◇', name: 'Decision', color: '#f59e0b' },
   { type: 'circle', emoji: '○', name: 'Start/End', color: '#22c55e' },
-  { type: 'parallelogram', emoji: '▱', name: 'Input/Out', color: '#818cf8' },
+  { type: 'parallelogram', emoji: '▱', name: 'I/O', color: '#818cf8' },
 ];
 
 function NodeTypePicker({ onSelect, onClose }: { onSelect: (t: string) => void; onClose: () => void }) {
   return (
     <>
       <div onClick={onClose} style={{ position: 'fixed', inset: 0, zIndex: 40 }} />
-      <div style={{ position: 'absolute', top: '40px', left: 0, background: '#1e293b', border: '1px solid #334155', borderRadius: '12px', padding: '10px', zIndex: 50, display: 'flex', gap: '6px', boxShadow: '0 8px 32px rgba(0,0,0,0.5)' }}>
+      <div style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', background: '#1e293b', border: '1px solid #334155', borderRadius: '12px', padding: '12px', zIndex: 50, display: 'flex', gap: '8px', boxShadow: '0 8px 32px rgba(0,0,0,0.5)', flexWrap: 'wrap', maxWidth: '90vw', justifyContent: 'center' }}>
         {NODE_OPTIONS.map(opt => (
-          <button key={opt.type} onClick={() => { onSelect(opt.type); onClose(); }} style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #334155', background: '#0f172a', color: '#f8fafc', cursor: 'pointer', textAlign: 'center', fontSize: '11px', minWidth: '64px' }}>
+          <button key={opt.type} onClick={() => { onSelect(opt.type); onClose(); }} style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #334155', background: '#0f172a', color: '#f8fafc', cursor: 'pointer', textAlign: 'center', fontSize: '11px', minWidth: '64px' }}>
             <div style={{ fontSize: '18px', color: opt.color, marginBottom: '3px' }}>{opt.emoji}</div>
             <div style={{ fontWeight: 600 }}>{opt.name}</div>
           </button>
@@ -95,13 +95,13 @@ function AIPanel({ onGenerate, onClose, generating }: { onGenerate: (p: string) 
   return (
     <>
       <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 40 }} />
-      <div style={{ position: 'fixed', bottom: '24px', left: '50%', transform: 'translateX(-50%)', width: '320px', background: '#0f172a', border: '1px solid #334155', borderRadius: '16px', padding: '20px', zIndex: 50, boxShadow: '0 16px 48px rgba(0,0,0,0.6)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-          <span style={{ color: '#f8fafc', fontWeight: 700, fontSize: '15px' }}><Sparkles size={16} color="#a78bfa" /> AI Flow Generator</span>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#64748b', fontSize: '20px', cursor: 'pointer' }}>x</button>
+      <div style={{ position: 'fixed', bottom: '16px', left: '50%', transform: 'translateX(-50%)', width: 'calc(100vw - 32px)', maxWidth: '360px', background: '#0f172a', border: '1px solid #334155', borderRadius: '16px', padding: '16px', zIndex: 50, boxShadow: '0 16px 48px rgba(0,0,0,0.6)', boxSizing: 'border-box' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+          <span style={{ color: '#f8fafc', fontWeight: 700, fontSize: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}><Sparkles size={16} color="#a78bfa" /> AI Flow Generator</span>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#64748b', fontSize: '20px', cursor: 'pointer' }}>×</button>
         </div>
-        <textarea value={prompt} onChange={e => setPrompt(e.target.value)} placeholder="Describe your flow..." style={{ width: '100%', height: '85px', padding: '10px 12px', borderRadius: '8px', border: '1px solid #334155', background: '#1e293b', color: '#f8fafc', fontSize: '13px', resize: 'none', outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
-        <div style={{ marginTop: '10px', marginBottom: '12px' }}>
+        <textarea value={prompt} onChange={e => setPrompt(e.target.value)} placeholder="Describe your flow..." style={{ width: '100%', height: '80px', padding: '10px 12px', borderRadius: '8px', border: '1px solid #334155', background: '#1e293b', color: '#f8fafc', fontSize: '13px', resize: 'none', outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
+        <div style={{ marginTop: '8px', marginBottom: '10px' }}>
           <div style={{ color: '#64748b', fontSize: '11px', marginBottom: '5px' }}>Quick examples:</div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
             {examples.map(ex => (
@@ -119,15 +119,15 @@ function AIPanel({ onGenerate, onClose, generating }: { onGenerate: (p: string) 
 
 function Toast({ message, type }: { message: string; type: 'success' | 'error' }) {
   return (
-    <div style={{ position: 'fixed', bottom: '24px', left: '50%', transform: 'translateX(-50%)', zIndex: 9999, display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 20px', borderRadius: '10px', background: type === 'success' ? '#166534' : '#991b1b', color: '#fff', fontSize: '14px', fontWeight: 600, boxShadow: '0 8px 24px rgba(0,0,0,0.3)' }}>
-      {type === 'success' ? <CheckCircle size={16} /> : <XCircle size={16} />}
+    <div style={{ position: 'fixed', bottom: '24px', left: '50%', transform: 'translateX(-50%)', zIndex: 9999, display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 16px', borderRadius: '10px', background: type === 'success' ? '#166534' : '#991b1b', color: '#fff', fontSize: '13px', fontWeight: 600, boxShadow: '0 8px 24px rgba(0,0,0,0.3)', whiteSpace: 'nowrap' }}>
+      {type === 'success' ? <CheckCircle size={15} /> : <XCircle size={15} />}
       {message}
     </div>
   );
 }
 
 function btn(bg: string, border: string, color = '#f1f5f9') {
-  return { display: 'flex' as const, alignItems: 'center' as const, gap: '5px', padding: '6px 11px', borderRadius: '7px', border: `1px solid ${border}`, background: bg, color, fontSize: '12px', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' as const };
+  return { display: 'flex' as const, alignItems: 'center' as const, gap: '4px', padding: '6px 10px', borderRadius: '7px', border: `1px solid ${border}`, background: bg, color, fontSize: '11px', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' as const };
 }
 
 const initialNodes: Node[] = [
@@ -243,44 +243,68 @@ function FlowEditorInner() {
   }, [setNodes]);
 
   return (
-    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: '#020617' }}>
-      <header style={{ background: '#0f172a', borderBottom: '1px solid #1e293b', padding: '10px 14px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-          <span style={{ fontWeight: 800, color: '#f8fafc', fontSize: '17px', marginRight: '4px' }}>FLOW.CRAFT</span>
-          <input type="text" value={flowName} onChange={e => setFlowName(e.target.value)} style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '7px', padding: '5px 10px', color: '#f8fafc', fontSize: '12px', outline: 'none', width: '130px' }} />
-          <button onClick={handleNew} style={btn('#1e293b', '#334155')}><Plus size={13} /> New</button>
+    <div style={{ height: '100vh', width: '100vw', display: 'flex', flexDirection: 'column', background: '#020617', overflow: 'hidden' }}>
+      {/* HEADER */}
+      <header style={{ background: '#0f172a', borderBottom: '1px solid #1e293b', padding: '8px 10px', flexShrink: 0 }}>
+        {/* Row 1: Logo + Name + Logout */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
+          <span style={{ fontWeight: 800, color: '#f8fafc', fontSize: '15px', flexShrink: 0 }}>FLOW.CRAFT</span>
+          <input
+            type="text"
+            value={flowName}
+            onChange={e => setFlowName(e.target.value)}
+            style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '7px', padding: '5px 8px', color: '#f8fafc', fontSize: '11px', outline: 'none', flex: 1, minWidth: 0 }}
+          />
+          <button onClick={signOut} style={btn('#7f1d1d', '#dc2626')}><LogOut size={12} /></button>
+        </div>
+
+        {/* Row 2: Action buttons */}
+        <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
+          <button onClick={handleNew} style={btn('#1e293b', '#334155')}><Plus size={12} /> New</button>
           <div style={{ position: 'relative' }}>
-            <button onClick={() => setShowNodePicker(p => !p)} style={btn('#1e293b', '#334155')}><Plus size={13} /> Add Node</button>
+            <button onClick={() => setShowNodePicker(p => !p)} style={btn('#1e293b', '#334155')}><Plus size={12} /> Node</button>
             {showNodePicker && <NodeTypePicker onSelect={addNode} onClose={() => setShowNodePicker(false)} />}
           </div>
           <button onClick={() => setShowAIPanel(true)} disabled={generating} style={btn('#2e1065', '#7c3aed', '#e9d5ff')}>
-            {generating ? <Loader size={13} style={{ animation: 'spin 1s linear infinite' }} /> : <Sparkles size={13} />}
-            {generating ? 'Generating...' : 'AI Generate'}
+            {generating ? <Loader size={12} style={{ animation: 'spin 1s linear infinite' }} /> : <Sparkles size={12} />}
+            {generating ? 'Generating...' : 'AI'}
           </button>
-          <button onClick={handleSave} disabled={saving} style={btn('#14532d', '#16a34a')}><Save size={13} /> {saving ? 'Saving...' : 'Save'}</button>
-          <button onClick={() => { setShowLoadMenu(p => !p); loadFlows(); }} style={btn('#1e3a8a', '#2563eb')}><FolderOpen size={13} /> Load</button>
-          <button onClick={signOut} style={btn('#7f1d1d', '#dc2626')}><LogOut size={13} /> Out</button>
-        </div>
-        <div style={{ display: 'flex', gap: '10px', marginTop: '7px', flexWrap: 'wrap' }}>
-          {NODE_OPTIONS.map(opt => (
-            <span key={opt.type} style={{ fontSize: '10px', color: opt.color }}>{opt.emoji} {opt.name}</span>
-          ))}
-          <span style={{ fontSize: '10px', color: '#475569' }}>Double-tap to edit</span>
+          <button onClick={handleSave} disabled={saving} style={btn('#14532d', '#16a34a')}>
+            <Save size={12} /> {saving ? 'Saving...' : 'Save'}
+          </button>
+          <button onClick={() => { setShowLoadMenu(p => !p); loadFlows(); }} style={btn('#1e3a8a', '#2563eb')}>
+            <FolderOpen size={12} /> Load
+          </button>
         </div>
       </header>
 
-      <div style={{ flex: 1, position: 'relative' }}>
-      <ReactFlow nodes={nodes} edges={edges} onNodesChange={onNodesChange} onEdgesChange={onEdgesChange} onConnect={onConnect} onNodeDoubleClick={onNodeDoubleClick} nodeTypes={nodeTypes} defaultViewport={{ x: 50, y: 50, zoom: 1 }}
+      {/* FLOW CANVAS */}
+      <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onConnect={onConnect}
+          onNodeDoubleClick={onNodeDoubleClick}
+          nodeTypes={nodeTypes}
+          defaultViewport={{ x: 50, y: 50, zoom: 0.8 }}
+          fitView
+        >
           <Controls />
-          <MiniMap nodeColor={n => n.type === 'diamond' ? '#f59e0b' : n.type === 'circle' ? '#22c55e' : n.type === 'parallelogram' ? '#818cf8' : '#3b82f6'} style={{ background: '#1e293b', border: '1px solid #334155' }} />
+          <MiniMap
+            nodeColor={n => n.type === 'diamond' ? '#f59e0b' : n.type === 'circle' ? '#22c55e' : n.type === 'parallelogram' ? '#818cf8' : '#3b82f6'}
+            style={{ background: '#1e293b', border: '1px solid #334155' }}
+          />
           <Background variant={BackgroundVariant.Dots} gap={16} size={1} color="#1e293b" />
         </ReactFlow>
 
+        {/* LOAD MENU */}
         {showLoadMenu && (
-          <div style={{ position: 'absolute', top: '12px', right: '12px', background: '#0f172a', border: '1px solid #1e293b', borderRadius: '12px', padding: '14px', width: '270px', maxHeight: '370px', overflowY: 'auto', zIndex: 50, boxShadow: '0 8px 32px rgba(0,0,0,0.5)' }}>
+          <div style={{ position: 'absolute', top: '12px', right: '12px', background: '#0f172a', border: '1px solid #1e293b', borderRadius: '12px', padding: '14px', width: 'min(270px, calc(100vw - 24px))', maxHeight: '60vh', overflowY: 'auto', zIndex: 50, boxShadow: '0 8px 32px rgba(0,0,0,0.5)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
               <span style={{ color: '#f8fafc', fontWeight: 700, fontSize: '13px' }}>Your Flows</span>
-              <button onClick={() => setShowLoadMenu(false)} style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: '18px' }}>x</button>
+              <button onClick={() => setShowLoadMenu(false)} style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: '18px' }}>×</button>
             </div>
             {flows.length === 0
               ? <p style={{ color: '#475569', fontSize: '12px', textAlign: 'center', padding: '16px 0' }}>No saved flows yet</p>
@@ -311,4 +335,4 @@ export function FlowEditor() {
       <FlowEditorInner />
     </ReactFlowProvider>
   );
-  }
+                 }
