@@ -228,7 +228,9 @@ function FlowEditorInner() {
       setFlowName(parsed.flowName || prompt);
       setCurrentFlowId(null);
       showToast('AI flow generated!', 'success');
-      setTimeout(() => fitView({ padding: 0.3, duration: 800 }), 500);
+      setTimeout(() => fitView({ padding: 0.2, duration: 500 }), 100);
+setTimeout(() => fitView({ padding: 0.2, duration: 500 }), 600);
+setTimeout(() => fitView({ padding: 0.2, duration: 500 }), 1200);
     } catch (err) {
       showToast('AI generation failed!', 'error');
     }
