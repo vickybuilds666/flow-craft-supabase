@@ -270,7 +270,7 @@ function FlowEditorInner() {
       </header>
 
       <div style={{ flex: 1, position: 'relative' }}>
-      <ReactFlow nodes={nodes} edges={edges} onNodesChange={onNodesChange} onEdgesChange={onEdgesChange} onConnect={onConnect} onNodeDoubleClick={onNodeDoubleClick} nodeTypes={nodeTypes} fitView minZoom={0.1}>
+      <ReactFlow nodes={nodes} edges={edges} onNodesChange={onNodesChange} onEdgesChange={onEdgesChange} onConnect={onConnect} onNodeDoubleClick={onNodeDoubleClick} nodeTypes={nodeTypes} defaultViewport={{ x: 50, y: 50, zoom: 1 }}
           <Controls />
           <MiniMap nodeColor={n => n.type === 'diamond' ? '#f59e0b' : n.type === 'circle' ? '#22c55e' : n.type === 'parallelogram' ? '#818cf8' : '#3b82f6'} style={{ background: '#1e293b', border: '1px solid #334155' }} />
           <Background variant={BackgroundVariant.Dots} gap={16} size={1} color="#1e293b" />
