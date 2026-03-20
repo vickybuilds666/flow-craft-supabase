@@ -270,14 +270,14 @@ function FlowEditorInner() {
       </header>
 
       <div style={{ flex: 1, position: 'relative' }}>
-        <ReactFlow nodes={nodes} edges={edges} onNodesChange={onNodesChange} onEdgesChange={onEdgesChange} onConnect={onConnect} onNodeDoubleClick={onNodeDoubleClick} nodeTypes={nodeTypes} fitView fitView={false} defaultViewport={{ x: 0, y: 0, zoom: 0.5 }}
+      <ReactFlow nodes={nodes} edges={edges} onNodesChange={onNodesChange} onEdgesChange={onEdgesChange} onConnect={onConnect} onNodeDoubleClick={onNodeDoubleClick} nodeTypes={nodeTypes} fitView={false} defaultViewport={{ x: 0, y: 0, zoom: 0.5 }} minZoom={0.1}>
           <Controls />
           <MiniMap nodeColor={n => n.type === 'diamond' ? '#f59e0b' : n.type === 'circle' ? '#22c55e' : n.type === 'parallelogram' ? '#818cf8' : '#3b82f6'} style={{ background: '#1e293b', border: '1px solid #334155' }} />
           <Background variant={BackgroundVariant.Dots} gap={16} size={1} color="#1e293b" />
         </ReactFlow>
 
         {showLoadMenu && (
-          <div style={{ position: 'absolute', top: '12px', right: '12px', background: '#0f172a', border: '1px solid #1e293b', borderRadius: '12px', padding: '14px', width: '270px', maxHeight: '370px', overflowY: 'auto', zIndex: 50, boxShadow: '0 8px 32px rgba(0,0,0,0.5)' }}>
+          <div style={{ position: 'absolute', top: '12px', right: '12px', background: '#0f172a', border: '1px solid #1e293b', borderRadius: '12px', padding: '14px', width: '270px', maxHeight: '370px', overflowY: 'auto', zIndex: 50, boxShadow: '0 8
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
               <span style={{ color: '#f8fafc', fontWeight: 700, fontSize: '13px' }}>Your Flows</span>
               <button onClick={() => setShowLoadMenu(false)} style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: '18px' }}>x</button>
