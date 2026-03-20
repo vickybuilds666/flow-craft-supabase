@@ -277,7 +277,7 @@ function FlowEditorInner() {
         </ReactFlow>
 
         {showLoadMenu && (
-          <div style={{ position: 'absolute', top: '12px', right: '12px', background: '#0f172a', border: '1px solid #1e293b', borderRadius: '12px', padding: '14px', width: '270px', maxHeight: '370px', overflowY: 'auto', zIndex: 50, boxShadow: '0 8
+          <div style={{ position: 'absolute', top: '12px', right: '12px', background: '#0f172a', border: '1px solid #1e293b', borderRadius: '12px', padding: '14px', width: '270px', maxHeight: '370px', overflowY: 'auto', zIndex: 50, boxShadow: '0 8px 32px rgba(0,0,0,0.5)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
               <span style={{ color: '#f8fafc', fontWeight: 700, fontSize: '13px' }}>Your Flows</span>
               <button onClick={() => setShowLoadMenu(false)} style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: '18px' }}>x</button>
