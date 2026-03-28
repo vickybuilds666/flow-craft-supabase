@@ -230,7 +230,9 @@ function FlowEditorInner() {
       setFlowName(parsed.flowName || prompt);
       setCurrentFlowId(null);
       showToast('AI flow generated!', 'success');
-      setTimeout(() => fitView({ padding: 0.2 }), 300);
+      setTimeout(() => fitView({ padding: 0.2 }), 100);
+      setTimeout(() => fitView({ padding: 0.2 }), 500);
+      setTimeout(() => fitView({ padding: 0.2 }), 1000);
     } catch (err) {
       showToast('AI generation failed!', 'error');
     }
@@ -331,4 +333,4 @@ export function FlowEditor() {
       <FlowEditorInner />
     </ReactFlowProvider>
   );
-                                                                                                     }
+                 }
