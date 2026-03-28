@@ -169,6 +169,7 @@ function FlowEditorInner() {
         setEdges(data.data.edges || []);
         setFlowName(data.name);
         setCurrentFlowId(data.id);
+        setTimeout(() => fitView({ padding: 0.2 }), 300);
       }
     };
     autoLoad();
@@ -201,6 +202,7 @@ function FlowEditorInner() {
     setFlowName(flow.name);
     setCurrentFlowId(flow.id);
     setShowLoadMenu(false);
+    setTimeout(() => fitView({ padding: 0.2 }), 100);
   };
 
   const handleDelete = async (flowId: string) => {
@@ -228,7 +230,7 @@ function FlowEditorInner() {
       setFlowName(parsed.flowName || prompt);
       setCurrentFlowId(null);
       showToast('AI flow generated!', 'success');
-      setNodes(prev => prev.map((n, i) => ({ ...n, position: { x: 50, y: 50 + i * 100 } })));
+      setTimeout(() => fitView({ padding: 0.2 }), 300);
     } catch (err) {
       showToast('AI generation failed!', 'error');
     }
@@ -244,9 +246,7 @@ function FlowEditorInner() {
 
   return (
     <div style={{ height: '100vh', width: '100vw', display: 'flex', flexDirection: 'column', background: '#020617', overflow: 'hidden' }}>
-      {/* HEADER */}
       <header style={{ background: '#0f172a', borderBottom: '1px solid #1e293b', padding: '8px 10px', flexShrink: 0 }}>
-        {/* Row 1: Logo + Name + Logout */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
           <span style={{ fontWeight: 800, color: '#f8fafc', fontSize: '15px', flexShrink: 0 }}>FLOW.CRAFT</span>
           <input
@@ -257,8 +257,6 @@ function FlowEditorInner() {
           />
           <button onClick={signOut} style={btn('#7f1d1d', '#dc2626')}><LogOut size={12} /></button>
         </div>
-
-        {/* Row 2: Action buttons */}
         <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
           <button onClick={handleNew} style={btn('#1e293b', '#334155')}><Plus size={12} /> New</button>
           <div style={{ position: 'relative' }}>
@@ -278,7 +276,6 @@ function FlowEditorInner() {
         </div>
       </header>
 
-      {/* FLOW CANVAS */}
       <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
         <ReactFlow
           nodes={nodes}
@@ -299,7 +296,6 @@ function FlowEditorInner() {
           <Background variant={BackgroundVariant.Dots} gap={16} size={1} color="#1e293b" />
         </ReactFlow>
 
-        {/* LOAD MENU */}
         {showLoadMenu && (
           <div style={{ position: 'absolute', top: '12px', right: '12px', background: '#0f172a', border: '1px solid #1e293b', borderRadius: '12px', padding: '14px', width: 'min(270px, calc(100vw - 24px))', maxHeight: '60vh', overflowY: 'auto', zIndex: 50, boxShadow: '0 8px 32px rgba(0,0,0,0.5)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
@@ -335,4 +331,4 @@ export function FlowEditor() {
       <FlowEditorInner />
     </ReactFlowProvider>
   );
-                 }
+                                                                                                     }
