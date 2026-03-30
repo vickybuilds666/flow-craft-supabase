@@ -224,15 +224,18 @@ function FlowEditorInner() {
     try {
       const response = await fetch('/.netlify/functions/generate-flow', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt }) });
       const parsed = await response.json();
-      const fixedNodes = (parsed.nodes || []).map((n: Node, i: number) => ({ ...n, position: { x: 150, y: 50 + i * 120 } }));
+      const fixedNodes = (parsed.nodes || []).map((n: Node, i: number) => ({ ...n, position: { x: 0, y: i * 120 } }));
       setNodes(fixedNodes);
       setEdges(parsed.edges || []);
       setFlowName(parsed.flowName || prompt);
       setCurrentFlowId(null);
       showToast('AI flow generated!', 'success');
-      setTimeout(() => fitView({ padding: 0.2 }), 100);
-      setTimeout(() => fitView({ padding: 0.2 }), 500);
-      setTimeout(() => fitView({ padding: 0.2 }), 1000);
+      setTimeout(() => {
+        window.requestAnimationFrame(() => {
+          fitView({ padding: 0.2, duration: 500 });
+        });
+      }, 50);
+      setTimeout(() => fitView({ padding: 0.2, duration: 300 }), 600);
     } catch (err) {
       showToast('AI generation failed!', 'error');
     }
@@ -289,6 +292,8 @@ function FlowEditorInner() {
           nodeTypes={nodeTypes}
           defaultViewport={{ x: 50, y: 50, zoom: 0.8 }}
           fitView
+          fitViewOptions={{ padding: 0.2 }}
+          onInit={(instance) => { setTimeout(() => instance.fitView({ padding: 0.2 }), 100); }}
         >
           <Controls />
           <MiniMap
@@ -334,4 +339,3 @@ export function FlowEditor() {
     </ReactFlowProvider>
   );
                  }
-        
